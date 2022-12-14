@@ -1,0 +1,22 @@
+#!/bin/sh
+
+#################
+### Variables ###
+#################
+
+# We need these local variables for the script
+XDG_CONFIG_HOME="$HOME/.config"
+XDG_DATA_HOME="$HOME/.local/share"
+
+# We export these variables for later shell sessions
+{ echo 'export XDG_CONFIG_HOME="$HOME/.config"';
+echo 'export XDG_DATA_HOME="$HOME/.local/share"';
+echo 'export XDG_CACHE_HOME="$HOME/.local/cache"';
+echo 'export VIMINIT="set nocp | source ${XDG_CONFIG_HOME:-$HOME/.config}/vim/vimrc"'; } >> "$HOME"/.bashrc
+
+##############
+### Import ###
+##############
+
+mkdir "$XDG_CONFIG_HOME"/vim
+cp vimrc "$XDG_CONFIG_HOME"/vim/
