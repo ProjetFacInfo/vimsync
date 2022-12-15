@@ -41,7 +41,7 @@ let g:polyglot_disabled = ['autoindent']
 Plug 'sheerun/vim-polyglot'
 Plug 'vim-scripts/dbext.vim'
 
-Plug 'arcticicestudio/nord-vim'
+Plug 'dracula/vim',{'as':'dracula'}
 Plug 'itchyny/vim-cursorword'
 Plug 'RRethy/vim-hexokinase', { 'do': 'make hexokinase' }
 Plug 'junegunn/goyo.vim'
@@ -239,7 +239,7 @@ set infercase
 " <leader>p and other keys. look at the mappings!
 set laststatus=2
 let g:lightline = {
- 	\ 'colorscheme':  'nord',
+ 	\ 'colorscheme':  'dracula',
  	\ 'separator':    { 'left': '', 'right': '' },
  	\ 'subseparator': { 'left': '', 'right': '' },
       	\ 'active': {
@@ -267,22 +267,22 @@ let g:lightline#bufferline#composed_number_map = {
 \ 11: '#11', 12: '#12', 13: '#13', 14: '#14', 15: '#15',
 \ 16: '#16', 17: '#17', 18: '#18', 19: '#19', 20: '#20'}
 
-" Nord theme
-let g:nord_italic = 1
-let g:nord_italic_comments = 1
-let g:nord_underline = 1
-let g:nord_cursor_line_number_background = 1
+" dracula theme
+let g:dracula_italic = 1
+let g:dracula_italic_comments = 1
+let g:dracula_underline = 1
+let g:dracula_cursor_line_number_background = 1
 
 " Make highligted searches red and highlight column 81 in gray
-augroup nord-theme-overrides
+augroup dracula-theme-overrides
 	autocmd!
-	autocmd ColorScheme nord highlight Search term=reverse guifg=fg guibg=#BF616A
-	autocmd ColorScheme nord highlight IncSearch term=reverse gui=underline guifg=fg guibg=#BF616A
-	autocmd ColorScheme nord highlight ColorColumn guibg=#4C566A
+	autocmd ColorScheme dracula highlight Search term=reverse guifg=fg guibg=#BF616A
+	autocmd ColorScheme dracula highlight IncSearch term=reverse gui=underline guifg=fg guibg=#BF616A
+	autocmd ColorScheme dracula highlight ColorColumn guibg=#4C566A
 augroup END
 call matchadd('ColorColumn', '\%81v',100)
 
-colorscheme nord
+colorscheme dracula
 
 " Dirvish file viewer
 let g:dirvish_mode = 1

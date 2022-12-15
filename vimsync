@@ -20,3 +20,21 @@ echo 'export VIMINIT="set nocp | source ${XDG_CONFIG_HOME:-$HOME/.config}/vim/vi
 
 mkdir "$XDG_CONFIG_HOME"/vim
 cp vimrc "$XDG_CONFIG_HOME"/vim/
+
+if [ "$TERM" = "xterm-256color" ]
+then
+	cp Dracula.colorscheme "$XDG_DATA_HOME"/konsole/Dracula.colorscheme
+	echo "konsoleprofile colors=Dracula" >> "$HOME"/.bashrc
+fi
+
+################
+### Keyboard ###
+################
+
+# Add vi mode to bash and change keyboard settings. Just press 1 or 9 to change the layout if needed
+{	echo "set -o vi";
+	echo 'alias 1="setxkbmap -layout fr -option caps:swapescape"'; } >> "$HOME"/.bashrc
+
+# We need to do this to source the new bashrc
+killall konsole && konsole &
+
