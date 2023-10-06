@@ -1,0 +1,51 @@
+#!/bin/sh
+
+bad_option()
+{
+	usage
+	exit 1
+}
+
+usage()
+{
+	printf "USAGE:
+	\t./vimsync OPTION
+	OPTIONS:
+	\t-h       : show this help message
+	\t-l       : sync with local files (you need to have cloned the repo for this to work)
+	\t-f 			 : force the copy\n"
+}
+
+local_mode=false
+force=false
+
+while getopts lfh option; do
+	case $option in
+		(l)
+			local_mode=true;;
+		(f)
+			force=true;;
+		(h | *)
+			bad_option;;
+	esac
+done
+
+if $force && ! $local_mode; then
+	bad_option
+fi
+
+if $local_mode; then
+	if $force; then
+		cp -fr .bashrc .config .local "$HOME"
+	else
+		cp -ir .bashrc .config .local "$HOME"
+	fi
+
+	xkbcomp "$HOME"/.config/xkb/latin-programmer-dvorak "$DISPLAY"
+	xmodmap -e 'keycode 135 = Super_R'
+	kwinrc --replace &
+	firefox https://addons.mozilla.org/firefox/downloads/file/4047348/vimium_c-1.99.995.xpi &
+	killall konsole && konsole &
+else
+	bad_option
+fi

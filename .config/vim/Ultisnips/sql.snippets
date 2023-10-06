@@ -1,0 +1,305 @@
+#=========================================
+#              Pl/PostrgreSQL            =
+#=========================================
+
+snippet todo ""
+	 TODO : ${1:unfinished job again! }
+${0}
+endsnippet
+
+snippet rn "Raise notice"
+RAISE NOTICE 'afficher % dans la console...', ${1:attr};
+endsnippet
+
+#=================
+# Query
+#=================
+
+snippet select "Select statement"
+SELECT ${0:*} FROM ${1} WHERE 1 = 1;
+endsnippet
+
+snippet selectc "Select count statement"
+SELECT COUNT(1) FROM ${1} WHERE ${0};
+endsnippet
+
+snippet selecti "Select into statement"
+--Only 1 row should be return
+SELECT INTO ${1:param} FROM ${2:table} WHERE ${0};
+endsnippet
+
+snippet insert "insert into statement"
+INSERT INTO ${1:table} VALUES
+('','','');
+endsnippet
+
+snippet update "update value in table"
+UPDATE ${1:table} SET ${2:param}  = ${3:param}  WHERE ${0:cdt};
+endsnippet
+
+snippet updatec "Cursor update or delete"
+	UPDATE ${1:table} SET ${2:param}  = ${3:param}  WHERE CURRENT OF ${0:rec};
+endsnippet
+
+snippet updatetg "update value in table with trigger"
+UPDATE ${1:table} SET ${2:param}  = ${3:param}  WHERE ${4:param} = ${0:new|old_param};
+endsnippet
+
+snippet del "update row in table"
+DELETE FROM ${1:table} WHERE ${0:cdt};
+endsnippet
+
+#=================
+# Table Operation
+#=================
+
+snippet seq "Create Sequence"
+DROP SEQUENCE IF EXISTS seq${1:Name};
+
+CREATE SEQUENCE seq$1 MINVALUE ${2:1};
+endsnippet
+
+snippet drtab "Drop Table"
+DROP TABLE IF EXISTS ${1:name};
+
+endsnippet
+
+snippet crtab "Create Table"
+
+DROP TABLE IF EXISTS ${1:name};
+
+CREATE TABLE ${1:name}
+(
+	${2:attr1} ${3:type1},
+	${4:attr2} ${5:type2},
+	${6:attrn} ${0:typen}
+);
+endsnippet
+
+snippet ccol  "Add VARCHAR2 column to table"
+	${1:,} ${2:name}	VARCHAR2(${0:100})
+endsnippet
+
+snippet dcol  "Add DATE column to table"
+	${1:,} ${0:name}	DATE
+endsnippet
+
+snippet ncol  "Add NUMBER column to table"
+	${1:,} ${0:name}	NUMBER
+endsnippet
+
+snippet at "Alter Table"
+	ALTER TABLE ${1:table} ${0}
+endsnippet
+
+#=================
+# Condition
+#=================
+
+snippet if "If Condition"
+	IF ${1} THEN
+		${0};
+	END IF;
+endsnippet
+
+snippet ife "IF-Else Condition"
+	IF ${1} THEN
+		${2};
+	ELSIF
+		${0};
+	END IF;
+endsnippet
+
+snippet els "Else Condition"
+	ELSIF ${1:condition} THEN
+		${0};
+endsnippet
+
+snippet case "Case statement"
+	CASE WHEN ${1} THEN
+		${2}
+	WHEN ${3} THEN
+		${4}
+	${0:ELSE}
+	END
+endsnippet
+
+#=================
+# Loop
+#=================
+
+snippet while "While Loop"
+	WHILE ${1:a} ${2:condition} ${3:b}	LOOP
+		${0};
+	END LOOP;
+endsnippet
+
+snippet fori "For Loop"
+	FOR ${1:indx} in ${2:1}..${3:10}  LOOP
+		${4};
+	END LOOP;
+endsnippet
+
+snippet foreach "Table For Loop"
+	FOREACH ${1:target} in ARRAY ${2:array} LOOP
+		${0};
+	END LOOP;
+endsnippet
+
+snippet loop "Loop statement"
+	LOOP
+		${0};
+	END LOOP;
+endsnippet
+
+snippet forc "For Cursor Loop"
+	FOR rec IN ${1:cur} ${2:(${3:param})}
+	LOOP
+		${0}
+	END LOOP;
+endsnippet
+
+#=================
+# Type
+#=================
+
+snippet ts "Type scalaire"
+	v${1:nom}  ${2:table}.${0:attr} %TYPE;
+endsnippet
+
+snippet tr "Type record rely on schema"
+	v${1:nom}  ${0:table} %ROWTYPE;
+endsnippet
+
+snippet tcurs "Type Cursor"
+	curs CURSOR FOR SELECT ${1:*} FROM ${0:table};
+endsnippet
+
+snippet tc "Type composed"
+DROP TABLE IF EXISTS $1;
+DROP TYPE IF EXISTS t_$1;
+
+CREATE TYPE t_${1:name} AS(
+	${2:attr1} ${3:type1},
+	${4:attr2} ${5:type2},
+	${6:attrn} ${0:typen}
+);
+
+CREATE TABLE $1 OF t_$1
+(primary key ($2));
+endsnippet
+
+snippet tenum "Type enum"
+CREATE TYPE ${1:name} AS
+ENUM (‘’,’’,’’’);
+endsnippet
+
+
+#=================
+# Cursor
+#=================
+
+snippet curs "Cursor statement"
+	curs CURSOR FOR SELECT ${0:*} FROM ${1:table};
+endsnippet
+
+#=================
+# Function
+#=================
+
+
+snippet fct "function block with for boucle"
+
+DROP FUNCTION IF EXISTS ${1:fctName}();
+
+CREATE OR REPLACE FUNCTION $1() returns ${2:return_type} AS $$
+DECLARE
+	curs CURSOR FOR SELECT ${3:param} FROM ${4:relation} ON ${5:cdt};
+	${6:var we need};
+BEGIN
+	FOR rec IN curs
+	LOOP
+		${7:function body};
+	END LOOP;
+EXCEPTION --Exception Block
+	WHEN ${8: error} THEN
+		RAISE NOTICE '${9:error msg}',;
+   	WHEN OTHERS THEN
+   		RAISE NOTICE '${0:other error msg}',;
+END;
+$$ language plpgsql;
+
+--Call function
+SELECT $1 ('','','');
+endsnippet
+
+snippet fcts "function block returns multilines "
+
+DROP FUNCTION IF EXISTS ${1:fctName}();
+
+CREATE OR REPLACE FUNCTION $1() returns setof ${2:return_type} AS $$
+	${6:var we need};
+DECLARE
+	curs CURSOR FOR SELECT ${3:param} FROM ${4:relation} ON ${5:cdt};
+BEGIN
+	FOR rec IN curs
+	LOOP
+		${7:function body};
+		return next rec.$3;
+	END LOOP;
+	return;
+EXCEPTION --Exception Block
+	WHEN ${8: error} THEN
+		RAISE NOTICE '${9:error msg}',;
+   	WHEN OTHERS THEN
+   		RAISE NOTICE '${0:other error msg}',;
+END;
+$$ language plpgsql;
+
+--Call function
+SELECT $1 ('','','');
+endsnippet
+
+snippet excp "Exception Block"
+	EXCEPTION --Exception Block
+		WHEN ${1: error} THEN
+			RAISE NOTICE '${2:error msg}',;
+		WHEN OTHERS THEN
+   			RAISE NOTICE '${0:other error msg}',;
+	END;
+endsnippet
+
+#=================
+# Trigger
+#=================
+
+snippet trigger "Trigger block"
+
+DROP TRIGGER IF EXISTS trig_Apres_DI_${1:TriggerName} ON $1;
+DROP FUNCTION IF EXISTS DI_$1();
+
+CREATE OR REPLACE FUNCTION DI_$1() returns TRIGGER AS $$
+BEGIN
+	IF (TG_OP = 'INSERT') THEN
+		UPDATE ${2:table} SET ${3:attr} = $3 + (new.$3 - old.$3) WHERE ${4:attrCdt} = new.$4;
+		RETURN new;
+	ELSE IF (TG_OP = 'DELETE') THEN
+		UPDATE ${6:table} SET ${6:attr} = $6 + (new.$6 - old.$6) WHERE ${7:attrCdt} = new.$7;
+		RETURN old;
+	ELSE
+		-- UPDATE ON
+		-- new.param = la nouvelle valeur de table.param
+		-- old.param = l'ancien valeur de table.param
+		UPDATE ${8:table} SET ${9:attr} = $9 + (new.$9 - old.$9) WHERE ${0:attrCdt} = new.$0;
+		RETURN new;
+	END IF;
+END;
+$$ language plpgsql;
+
+CREATE TRIGGER trig_Apres_DI_$1 before
+INSERT OR
+DELETE OR
+UPDATE ON
+$1
+FOR each ROW EXECUTE PROCEDURE DI_$1();
+endsnippet
