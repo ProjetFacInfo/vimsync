@@ -56,8 +56,8 @@ Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'majutsushi/tagbar', { 'on': 'TagbarOpenAutoClose' }
 
 " Snippits
-Plug 'SirVer/ultisnips'  , { 'for': ['vim-plug', 'python', 'cpp', 'c','css', 'html', 'sql'] }
-Plug 'honza/vim-snippets', { 'for': ['vim-plug', 'python', 'cpp', 'c','css', 'html', 'sql'] }
+Plug 'SirVer/ultisnips'  , { 'for': ['vim-plug', 'python', 'cpp', 'c','css', 'html', 'sql', 'javascript', 'php', 'sh'] }
+Plug 'honza/vim-snippets', { 'for': ['vim-plug', 'python', 'cpp', 'c','css', 'html', 'sql', 'javascript', 'php', 'sh'] }
 
 " Buffers, workflow
 Plug 'itchyny/lightline.vim'
@@ -66,6 +66,7 @@ Plug 'justinmk/vim-dirvish'
 Plug 'Konfekt/FastFold'
 
 " Text operations/manipulation
+Plug 'LunarWatcher/auto-pairs'
 Plug 'wellle/targets.vim'
 Plug 'justinmk/vim-sneak'
 Plug 'gcmt/wildfire.vim' " in Visual mode, type i' to select all text in '', or type i) i] i} ip
@@ -80,14 +81,8 @@ Plug 'preservim/vim-pencil'
 Plug 'terryma/vim-multiple-cursors'
 
 " HTML, CSS, JavaScript, PHP, JSON, etc.
-Plug 'elzr/vim-json'
-Plug 'spf13/PIV', { 'for' :['php', 'vim-plug'] }
 Plug 'gko/vim-coloresque', { 'for': ['vim-plug', 'php', 'html', 'javascript', 'css'] }
-Plug 'pangloss/vim-javascript', { 'for' :['javascript', 'vim-plug'] }
 Plug 'mattn/emmet-vim', { 'for': [ 'html', 'css', 'php', 'javascript' ] }
-
-" Python
-Plug 'vim-scripts/indentpython.vim'
 
 " Bookmarks
 Plug 'kshenoy/vim-signature'
@@ -266,11 +261,16 @@ let g:lion_squeeze_spaces = 1
 " " Autocompletion with mucomplete
 let g:mucomplete#enable_auto_at_startup = 1
 let g:mucomplete#completion_delay = 300
+let g:mucomplete#chains = {}
+let g:mucomplete#chains.default = ['ulti', 'path', 'omni', 'keyn', 'dict', 'uspl']
 set completeopt=menuone,noinsert
 set infercase
 
 "" Python-syntax
 let g:python_highlight_all = 1
+
+"" Auto-pairs
+let g:AutoPairsCompleteOnlyOnSpace = 1
 
 "" vim-signiture
 let g:SignatureMap = {
@@ -556,7 +556,6 @@ map <leader>s :setlocal spell!<CR>
 " (centered text plugin)
 map <leader>g :Goyo<CR>
 
-" map <leader>m :!g++ -Wpedantic -O3 %:p -o %:p:r.out && %:p:r.out<CR>
 
 " Compile function
 map <leader>m :call CompileRunGcc()<CR>
