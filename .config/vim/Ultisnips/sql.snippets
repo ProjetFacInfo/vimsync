@@ -2,6 +2,12 @@
 #              Pl/PostrgreSQL            =
 #=========================================
 
+snippet echo "print what we want"
+
+\echo '\n----------------Ex ${1:n} -----------------------\n'
+
+endsnippet
+
 snippet todo ""
 	 TODO : ${1:unfinished job again! }
 ${0}
@@ -182,7 +188,8 @@ DROP TYPE IF EXISTS t_$1;
 CREATE TYPE t_${1:name} AS(
 	${2:attr1} ${3:type1},
 	${4:attr2} ${5:type2},
-	${6:attrn} ${0:typen}
+	${6:attr3} ${7:type3},
+	${8:attrn} ${0:typen}
 );
 
 CREATE TABLE $1 OF t_$1
@@ -190,8 +197,10 @@ CREATE TABLE $1 OF t_$1
 endsnippet
 
 snippet tenum "Type enum"
-CREATE TYPE ${1:name} AS
-ENUM (‘’,’’,’’’);
+DROP TYPE IF EXISTS t_$1;
+
+CREATE TYPE t_${1:name} AS
+ENUM ('$2', '$3', '$4', '$5');
 endsnippet
 
 
@@ -200,7 +209,11 @@ endsnippet
 #=================
 
 snippet curs "Cursor statement"
-	curs CURSOR FOR SELECT ${0:*} FROM ${1:table};
+	curs CURSOR FOR
+	SELECT ${0:*}
+	FROM ${1:table}
+	JOIN ${2:table2}
+	WHERE ${3:cdt};
 endsnippet
 
 #=================
@@ -210,11 +223,14 @@ endsnippet
 
 snippet fct "function block with for boucle"
 
-DROP FUNCTION IF EXISTS ${1:fctName}();
+DROP FUNCTION IF EXISTS $1();
 
-CREATE OR REPLACE FUNCTION $1() returns ${2:return_type} AS $$
+CREATE OR REPLACE FUNCTION ${1:fctName}() returns ${2:return_type} AS $$
 DECLARE
-	curs CURSOR FOR SELECT ${3:param} FROM ${4:relation} ON ${5:cdt};
+	curs CURSOR FOR
+	SELECT ${3:param}
+	FROM ${4:relation}
+	WHERE ${5:cdt};
 	${6:var we need};
 BEGIN
 	FOR rec IN curs
@@ -235,12 +251,15 @@ endsnippet
 
 snippet fcts "function block returns multilines "
 
-DROP FUNCTION IF EXISTS ${1:fctName}();
+DROP FUNCTION IF EXISTS $1();
 
-CREATE OR REPLACE FUNCTION $1() returns setof ${2:return_type} AS $$
-	${6:var we need};
+CREATE OR REPLACE FUNCTION ${1:fctName}() returns setof ${2:return_type} AS $$
 DECLARE
-	curs CURSOR FOR SELECT ${3:param} FROM ${4:relation} ON ${5:cdt};
+	${6:var we need};
+	curs CURSOR FOR
+	SELECT ${3:param}
+	FROM ${4:relation}
+	WHERE ${5:cdt};
 BEGIN
 	FOR rec IN curs
 	LOOP
@@ -257,7 +276,7 @@ END;
 $$ language plpgsql;
 
 --Call function
-SELECT $1 ('','','');
+SELECT $1('','','');
 endsnippet
 
 snippet excp "Exception Block"
@@ -275,30 +294,34 @@ endsnippet
 
 snippet trigger "Trigger block"
 
-DROP TRIGGER IF EXISTS trig_Apres_DI_${1:TriggerName} ON ${2:table};
-DROP FUNCTION IF EXISTS DI_$1();
+DROP TRIGGER IF EXISTS trig_${1:TriggerName} ON ${2:table};
+DROP FUNCTION IF EXISTS $1();
 
-CREATE OR REPLACE FUNCTION DI_$1() returns TRIGGER AS $$
+CREATE OR REPLACE FUNCTION $1() returns TRIGGER AS $$
 BEGIN
 	IF (TG_OP = 'INSERT') THEN
-		UPDATE ${3:table} SET ${4:attr} = $4 + (new.$4 - old.$4) WHERE ${5:attrCdt} = new.$5;
+		UPDATE ${3:table}
+		SET ${4:attr} = $4 + (new.$4 - old.$4)
+		WHERE ${5:attrCdt} = new.$5;
 		RETURN new;
-	ELSE IF (TG_OP = 'DELETE') THEN
+	ELSIF (TG_OP = 'DELETE') THEN
 		RETURN old;
 	ELSE
 		-- UPDATE ON
 		-- new.param = la nouvelle valeur de table.param
 		-- old.param = l'ancien valeur de table.param
-		UPDATE ${6:table} SET ${7:attr} = $7 + (new.$7 - old.$7) WHERE ${0:attrCdt} = new.$0;
+		UPDATE ${6:table}
+		SET ${7:attr} = $7 + (new.$7 - old.$7)
+		WHERE ${0:attrCdt} = new.$0;
 		RETURN new;
 	END IF;
 END;
 $$ language plpgsql;
 
-CREATE TRIGGER trig_Apres_DI_$1 before
+CREATE TRIGGER trig_$1 before
 INSERT OR
 DELETE OR
 UPDATE ON
 $2
-FOR each ROW EXECUTE PROCEDURE DI_$1();
+FOR each ROW EXECUTE PROCEDURE $1();
 endsnippet
