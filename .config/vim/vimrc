@@ -36,12 +36,14 @@ endif
 " Install my plugins
 call plug#begin('$XDG_DATA_HOME/vim/plugged')
 
-" Polyglot decides to mess with tab settings for whatever reason
-" let g:polyglot_disabled = ['autoindent']
+" Languages
 Plug 'sheerun/vim-polyglot'
 Plug 'vim-scripts/dbext.vim'
 Plug 'elkowar/yuck.vim'
-Plug 'dracula/vim',{ 'as' : 'dracula' }
+
+" Aesthetics
+Plug 'dracula/vim', { 'as' : 'dracula' }
+Plug 'gko/vim-coloresque', { 'for': [ 'php', 'html', 'javascript', 'css'] }
 Plug 'itchyny/vim-cursorword'
 Plug 'junegunn/goyo.vim'
 
@@ -52,40 +54,33 @@ Plug 'lifepillar/vim-mucomplete'
 Plug 'junegunn/fzf.vim'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 
-" Taglist
-Plug 'majutsushi/tagbar', { 'on': 'TagbarOpenAutoClose' }
-
-" Snippits
-Plug 'SirVer/ultisnips'  , { 'for': ['vim-plug', 'python', 'cpp', 'c','css', 'html', 'sql', 'javascript', 'php', 'sh'] }
-Plug 'honza/vim-snippets', { 'for': ['vim-plug', 'python', 'cpp', 'c','css', 'html', 'sql', 'javascript', 'php', 'sh'] }
+" Snippets
+Plug 'SirVer/ultisnip'  , { 'for': ['vim-plug', 'python', 'cpp', 'c','css', 'html', 'sql'] }
+Plug 'honza/vim-snippets', { 'for': ['vim-plug', 'python', 'cpp', 'c','css', 'html', 'sql'] }
 
 " Buffers, workflow
+Plug '907th/vim-auto-save'
+Plug 'Konfekt/FastFold'
 Plug 'itchyny/lightline.vim'
 Plug 'mengelbrecht/lightline-bufferline'
 Plug 'justinmk/vim-dirvish'
-Plug 'Konfekt/FastFold'
+Plug 'mbbill/undotree'
 
 " Text operations/manipulation
 Plug 'LunarWatcher/auto-pairs'
 Plug 'wellle/targets.vim'
 Plug 'justinmk/vim-sneak'
+Plug 'rhysd/clever-f.vim'
 Plug 'gcmt/wildfire.vim' " in Visual mode, type i' to select all text in '', or type i) i] i} ip
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-speeddating'
 Plug 'tpope/vim-repeat'
 Plug 'tommcdo/vim-lion'
 Plug 'tommcdo/vim-exchange'
-Plug 'mbbill/undotree'
 Plug 'tomtom/tcomment_vim'
 Plug 'preservim/vim-pencil'
 Plug 'terryma/vim-multiple-cursors'
-
-" HTML, CSS, JavaScript, PHP, JSON, etc.
-Plug 'gko/vim-coloresque', { 'for': ['vim-plug', 'php', 'html', 'javascript', 'css'] }
 Plug 'mattn/emmet-vim', { 'for': [ 'html', 'css', 'php', 'javascript' ] }
-
-" Bookmarks
-Plug 'kshenoy/vim-signature'
 
 call plug#end()
 
@@ -98,11 +93,6 @@ runtime! macros/matchit.vim
 
 let loaded_netrw = 1
 let loaded_netrwPlugin = 1      "netrw -> 🗑
-
-filetype on
-filetype indent on
-filetype plugin on
-filetype plugin indent on
 
 set encoding=utf-8
 
@@ -119,8 +109,6 @@ set shortmess=a
 set title
 set number relativenumber
 
-set grepprg=rg\ --vimgrep\ --smart-case\ --follow
-
 " Search
 set ignorecase smartcase
 if has('extra_search')
@@ -129,6 +117,10 @@ endif
 
 if has('cmdline_info')
 	set ruler showcmd
+endif
+
+if has('path_extra')
+	set path=$PWD/**
 endif
 
 " Spelling correction
@@ -140,19 +132,16 @@ if has('syntax')
 endif
 
 " Changes cursor shape in different modes
-" set Vim-specific sequences for RGB colors and enable truecolor support
-if $TERM ==# "st-256color" && has('termguicolors')
-	let &t_SI = "\<Esc>[6 q"
-	let &t_SR = "\<Esc>[4 q"
-	let &t_EI = "\<Esc>[2 q"
-	let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
-	let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
-	set termguicolors
-elseif $TERM !=# "st-256color" && has('termguicolors')
+let &t_SI = "\<Esc>[6 q"
+let &t_SR = "\<Esc>[4 q"
+let &t_EI = "\<Esc>[2 q"
+let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+if $COLORTERM ==# "truecolor" && has('termguicolors')
 	set termguicolors
 endif
 
-" Tab complete for fuzzy finding
+" Tab complete
 if has('wildmenu')
 	set wildmenu wildignorecase wildmode=longest:list,full
 	if has('wildignore')
@@ -172,19 +161,13 @@ endif
 if has('persistent_undo')       " You can undo changes across sessions
 	set undolevels=5000
 	set autowriteall undofile autoread
+	set noswapfile
 else
+	redraw
 	echom "Your system doesn't support persistent undo ! Be careful !"
+	set updatecount=10
 endif
-set updatecount=10
-
-" Project navigation, open vim in the root dir of your project and then
-" Use find <filename> to open new buffer with the filename.
-" This is neat but I prefer to use e */**<file> since it has better fuzzy
-" finding (look at my binding)
-" the benefit of find is that it is not relative to your current directory
-if has('path_extra')
-	set path=$PWD/**
-endif
+let g:auto_save = 1
 
 " Folds
 if has('folding')
@@ -218,43 +201,15 @@ else
 	set autoindent
 endif
 
-" I use the smarttabs plugin so TABS are used to indent at the start of
-" lines and spaces are used to align stuff like comments you get the
-" best of both worlds ; user customizable indentation and consistent alignment
-set tabstop=4
-set shiftwidth=0
-set noexpandtab
-
 " ===
 " === Restore Cursor Position
 " ===
 au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
 
-" This function converts the file that I'm editing to my prefferd tabs and
-" spaces 'format'.
-" To use this function place your cursor on a line with 1 level of indentation!
-" because the function needs to know how many spaces = 1 level of indentation
-" to be able to convert them back to tabs
-function FixTabsAndSpaces()
-	" We convert all the tabs to spaces
-	set expandtab
-	retab
-
-	" We figure out the size of 1 level of indentation
-	let faketabsize = indent(line("."))
-	let l:tmp = &l:tabstop
-	let &l:tabstop = faketabsize
-
-	" Convert the spaces back into tabs only at the start of lines
-	set noexpandtab
-	RetabIndent
-
-	let &l:tabstop = tmp
-endfunction
-
 "-----------------------
 "=== Plugin settings ===
 "-----------------------
+let g:AutoPairsCompleteOnlyOnSpace = 1
 
 let g:lion_squeeze_spaces = 1
 
@@ -269,34 +224,6 @@ set infercase
 "" Python-syntax
 let g:python_highlight_all = 1
 
-"" Auto-pairs
-let g:AutoPairsCompleteOnlyOnSpace = 1
-
-"" vim-signiture
-let g:SignatureMap = {
-        \ 'Leader'             :  "m",
-        \ 'PlaceNextMark'      :  "m,",
-        \ 'ToggleMarkAtLine'   :  "m.",
-        \ 'PurgeMarksAtLine'   :  "dm-",
-        \ 'DeleteMark'         :  "dm",
-        \ 'PurgeMarks'         :  "dm/",
-        \ 'PurgeMarkers'       :  "dm?",
-        \ 'GotoNextLineAlpha'  :  "m<LEADER>",
-        \ 'GotoPrevLineAlpha'  :  "",
-        \ 'GotoNextSpotAlpha'  :  "m<LEADER>",
-        \ 'GotoPrevSpotAlpha'  :  "",
-        \ 'GotoNextLineByPos'  :  "",
-        \ 'GotoPrevLineByPos'  :  "",
-        \ 'GotoNextSpotByPos'  :  "mn",
-        \ 'GotoPrevSpotByPos'  :  "mp",
-        \ 'GotoNextMarker'     :  "",
-        \ 'GotoPrevMarker'     :  "",
-        \ 'GotoNextMarkerAny'  :  "",
-        \ 'GotoPrevMarkerAny'  :  "",
-        \ 'ListLocalMarks'     :  "m/",
-        \ 'ListLocalMarkers'   :  "m?"
-        \ }
-
 "" UltiSnip
 autocmd WinEnter * silent! iunmap <C-s>
 autocmd WinEnter * silent! unmap <C-s>
@@ -306,28 +233,25 @@ let g:UltiSnipsJumpForwardTrigger      = '<C-s>'
 let g:UltiSnipsJumpBackwardTrigger     = '<C-w>'
 let g:UltiSnipsSnippetDirectories = [$HOME.'/.config/vim/Ultisnips/', 'Ultisnips']
 
-" Lightline plugin get cool triangular font instead of square
-" And show open buffers on top, you can swap between buffers with <leader>n
+" show open buffers on top, you can swap between buffers with <leader>n
 " <leader>p and other keys. look at the mappings!
 set laststatus=2
 let g:lightline = {
- 	\ 'colorscheme':  'dracula',
- 	\ 'separator':    { 'left': '', 'right': '' },
- 	\ 'subseparator': { 'left': '', 'right': '' },
-      	\ 'active': {
-      	\   'left': [ [ 'mode', 'paste' ], [ 'readonly', 'filename', 'modified' ] ]
-      	\ },
-      	\ 'tabline': {
-      	\   'left': [ ['buffers'] ],
-      	\   'right': [ ['close'] ]
-      	\ },
-      	\ 'component_expand': {
-      	\   'buffers': 'lightline#bufferline#buffers'
-      	\ },
-      	\ 'component_type': {
-      	\   'buffers': 'tabsel'
-      	\ }
-      	\ }
+			\ 'colorscheme':  'dracula',
+			\ 'active': {
+			\   'left': [ [ 'mode', 'paste' ], [ 'readonly', 'filename', 'modified' ] ]
+			\ },
+			\ 'tabline': {
+			\   'left': [ ['buffers'] ],
+			\   'right': [ ['close'] ]
+			\ },
+			\ 'component_expand': {
+			\   'buffers': 'lightline#bufferline#buffers'
+			\ },
+			\ 'component_type': {
+			\   'buffers': 'tabsel'
+			\ }
+			\ }
 
 set showtabline=2
 let g:lightline#bufferline#show_number = 2
@@ -341,12 +265,12 @@ let g:lightline#bufferline#composed_number_map = {
 
 
 " Make highligted searches red and highlight column 81 in gray
-" augroup dracula-theme-overrides
-" 	autocmd!
-" 	autocmd ColorScheme dracula highlight Search term=reverse guifg=fg guibg=#BF616A
-" 	autocmd ColorScheme dracula highlight IncSearch term=reverse gui=underline guifg=fg guibg=#BF616A
-" 	autocmd ColorScheme dracula highlight ColorColumn guibg=#4C566A
-" augroup END
+augroup dracula-theme-overrides
+	autocmd!
+	autocmd ColorScheme dracula highlight Search term=reverse guifg=fg guibg=#BF616A
+	autocmd ColorScheme dracula highlight IncSearch term=reverse gui=underline guifg=fg guibg=#BF616A
+	autocmd ColorScheme dracula highlight ColorColumn guibg=#4C566A
+augroup END
 call matchadd('ColorColumn', '\%81v',100)
 
 colorscheme dracula
@@ -357,7 +281,6 @@ let g:dirvish_mode = 1
 let g:dirvish_relative_paths = 0
 call dirvish#add_icon_fn({p -> p[-1:]=='/'?'📂':'📄'})
 
-
 "=======================
 "=== Global Bindings ===
 "=======================
@@ -367,6 +290,26 @@ let mapleader=" "
 " Swap visual and visual-block
 nnoremap v <C-V>
 nnoremap <C-v> v
+
+" What is Ex mode even?
+noremap Q <nop>
+
+" Move stuff in visual mode (wow)
+vnoremap J :m+1<CR>gv=gv
+vnoremap K :m-2<CR>gv=gv
+
+" Don't move cursor around
+nnoremap J mzJ`z
+nnoremap <C-d> <C-d>zz
+nnoremap <C-u> <C-u>zz
+nnoremap n nzzzv
+nnoremap N Nzzzv
+
+" Disable highlight search
+nnoremap <leader><leader> :noh<CR>
+
+" Substitute the word you're on
+" map <leader>s :%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>
 
 " Better bindings for navigating splits
 map <C-h> <C-w>h
@@ -380,20 +323,10 @@ map <leader>w :w<CR>
 
 map <leader>f :filetype detect<CR>
 
-" --
-" Open files in buffers or splits with fuzzy finding
-" --
-map <leader>v :vs **/*
-map <leader>h :sp **/*
-map <leader>e :e **/*
-
-" --
-"  Convert camel_case to snake_case
-"  --
-function CamelCaseToSnakeCase()
-	exe "normal :s#\\(\\<\\u\\l\\+\\|\\l\\+\\)\\(\\u\\)#\\l\\1_\\l\\2#g\<CR>"
-endfunc
-map <leader>sc :call CamelCaseToSnakeCase()<CR>
+command -range SnakeCase <line1>,<line2>s#\(\<\u\l\+\|\l\+\)\(\u\)#\l\1_\l\2#g
+map <leader>sk :SnakeCase<CR>:noh<CR>
+command -range CamelCase <line1>,<line2>s/\(_\)\(.\)/\u\2/g
+map <leader>ck :CamelCase<CR>:noh<CR>
 
 " --
 " Buffer controls with the lightline bufferline plugin
@@ -427,20 +360,18 @@ nmap <Leader>c) <Plug>lightline#bufferline#delete(8)
 nmap <Leader>c+ <Plug>lightline#bufferline#delete(9)
 nmap <Leader>c] <Plug>lightline#bufferline#delete(10)
 
-" schlepp
-vmap <unique> <up>    <Plug>SchleppUp
-vmap <unique> <down>  <Plug>SchleppDown
-vmap <unique> <left>  <Plug>SchleppLeft
-vmap <unique> <right> <Plug>SchleppRight
-
 " SQL Stuff
 
 " Automatically create drop statement at the head of the file for current line
 func DropTemplate()
-	if getline(".") =~? "TABLE" || getline(".") =~? "VIEW"
-		exe "normal 0wy2eggODROP \<Esc>pbiIF EXISTS \<Esc>A;\<Esc><C-o>"
-	elseif getline(".") =~? "SEQUENCE"
-		exe "normal 0wy2egg}ODROP \<Esc>pbiIF EXISTS \<Esc>A;\<Esc><C-o>"
+	if getline(".") =~? "CREATE TRIGGER"
+		exe "normal 0wy2eggODROP \<Esc>pbiIF EXISTS \<Esc>A;\<Esc>''j$vbbhygg$P''zz"
+		redraw
+		echom 'Drop statement added'
+	elseif getline(".") =~? "CREATE"
+		exe "normal 0wy2eggODROP \<Esc>pbiIF EXISTS \<Esc>A;\<Esc>''zz"
+		redraw
+		echom 'Drop statement added'
 	endif
 endfunc
 map <leader>fd :call DropTemplate()<CR>
@@ -508,6 +439,8 @@ nnoremap <silent> <Leader>f :Rg<CR>
 " Open buffers
 nnoremap <silent> <Leader>b :Buffers<CR>
 
+nnoremap <silent> <Leader>s :Snippets<CR>
+
 " Lines in the current buffers
 nnoremap <silent> <Leader>/ :BLines<CR>
 
@@ -534,9 +467,6 @@ nnoremap <silent> <Leader>h/ :History/<CR>
 " undotree
 map <leader>u :UndotreeToggle<CR>
 
-" Disable highlight search
-map <silent> <leader><leader> :noh<CR>
-
 " Look at folding settings
 map <silent> <leader>o :call ToggleOverview()<CR>
 
@@ -551,11 +481,12 @@ function ToggleReadonly()
 endfunction
 
 " Toggle spellcheck
-map <leader>s :setlocal spell!<CR>
+" map <leader>s :setlocal spell!<CR>
 
 " (centered text plugin)
-map <leader>g :Goyo<CR>
+map <leader>g :Goyo<CR>:set relativenumber<CR>
 
+" map <leader>m :!g++ -Wpedantic -O3 %:p -o %:p:r.out && %:p:r.out<CR>
 
 " Compile function
 map <leader>m :call CompileRunGcc()<CR>
