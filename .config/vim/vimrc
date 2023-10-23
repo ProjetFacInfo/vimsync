@@ -55,7 +55,7 @@ Plug 'junegunn/fzf.vim'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 
 " Snippets
-Plug 'SirVer/ultisnip'  , { 'for': ['vim-plug', 'python', 'cpp', 'c','css', 'html', 'sql'] }
+Plug 'SirVer/ultisnips'  , { 'for': ['vim-plug', 'python', 'cpp', 'c','css', 'html', 'sql'] }
 Plug 'honza/vim-snippets', { 'for': ['vim-plug', 'python', 'cpp', 'c','css', 'html', 'sql'] }
 
 " Buffers, workflow
