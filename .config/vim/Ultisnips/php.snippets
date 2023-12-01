@@ -1,0 +1,550 @@
+snippet todo ""
+	 TODO : ${1:job! }
+${0}
+endsnippet
+
+snippet $p ""
+	 $_POST['${0:var}']
+endsnippet
+
+snippet $g ""
+	 $_GET['${0:var}']
+endsnippet
+
+snippet $f ""
+	 $_FILES['${1:file_name_in_input}']['${0:attribut}']
+	 attribut : name, type, size, error.
+endsnippet
+
+snippet $c ""
+	 $_COOKIE['${0:var}']
+endsnippet
+
+snippet $s ""
+	 $_SESSION['${0:var}']
+endsnippet
+
+snippet clone ""
+//clone pour faire une copie d'un objet, si non c'est par pointeur!
+${1:new_object_array} = array_map(function($o) {return clone $o;}, ${0:object_array});
+endsnippet
+
+snippet test_class "test si un objet est une instance d'une class"
+function ${1:fct_name}($o) {
+	$class_name = get_class($o);
+	if (is_object($o) and ($o instanceof ${2:class})) {
+		${0:TODO:something};
+	} else {
+		throw new Exception("$class_name n'est pas un $2!");
+	}
+}
+endsnippet
+
+snippet class "class {..}"
+// Mettre les methodes en camel case!
+class ${1:`!p snip.rv = snip.basename or "name"`}
+implements ${0:interface}
+{
+	private  $$3;
+	private  $$5;
+	private  $$7;
+	private  $$9;
+
+	public function __construct(
+	${2:/* varType */} $${3:/* varName */},
+	${4:/* varType */} $${5:/* varName */},
+	${6:/* varType */} $${7:/* varName */},
+	${8:/* varType */} $${9:/* varName */},
+	){
+		$this->$3 = $$3;
+		$this->$5 = $$5;
+		$this->$7 = $$7;
+		$this->$9 = $$9;
+	}
+
+	public function get_$3() :$2 {return $this->$3;}
+	public function get_$5() :$4 {return $this->$5;}
+	public function get_$7() :$6 {return $this->$7;}
+	public function get_$9() :$8 {return $this->$9;}
+
+	public function set_$3($2 $$3) {$this->$3 = $$3;}
+	public function set_$5($4 $$5) {$this->$5 = $$5;}
+	public function set_$7($6 $$7) {$this->$7 = $$7;}
+	public function set_$9($8 $$9) {$this->$9 = $$9;}
+
+	public function __toString() : string {
+		return "$1: $3=" . $this->$3 . " $5=" . $this->$5 . " $7=" . $this->$7 . " $9=" . $this->$9 . "\n";
+	}
+};
+endsnippet
+
+snippet classf "class {..}"
+class ${1:`!p snip.rv = snip.basename or "name"`}
+extends ${0:parent}
+{
+	// attribut of this class
+	// private varName...
+
+	public function __construct(
+	// attribut of super class
+	${2:/* varType */} $${3:/* varName */},
+	${4:/* varType */} $${5:/* varName */},
+	${6:/* varType */} $${7:/* varName */},
+	${8:/* varType */} $${9:/* varName */};
+	// attribut of this class
+	// varType varName...
+	){
+		parent::__construct($$3, $$5, $$7, $$9);
+	}
+
+};
+endsnippet
+
+
+
+snippet setcookie "set a cookie with $_POST[var]"
+$${1:varName} = "${2:default value}";
+
+if (!empty($_POST["$1"])) {
+    $$1 = $_POST["$1"];
+    setcookie("$1", $$1, time()+${3:10});
+} else {
+    if (!empty($_COOKIE["$1"])) {
+        $$1 = $_COOKIE["$1"];
+    }
+}
+
+// A mettre dans un element html ou css
+<?php echo $$1?>;
+endsnippet
+
+
+snippet setsession "set a cookie with $_POST[var]"
+// définir juste une fois par page : session_start();
+session_start();
+$${1:varName} = "${2:default value}";
+
+if (!empty($_POST["$1"])) {
+    $$1 = $_POST["$1"];
+    $_SESSION["$1"] = $$1;
+} else {
+    if (!empty($_SESSION["$1"])) {
+        $$1 = $_SESSION["$1"];
+    }
+}
+
+// A mettre dans un element html ou css
+<?php echo $$1?>;
+endsnippet
+
+
+
+snippet importCSV "import date to file.csv"
+if (file_exists(__DIR__."/${1:fileName}.csv")) {
+	echo <<<GO
+			<table>
+				<th>${2:nomChamp}</th>
+				<th>${3:nomChamp}</th>
+				<th>${4:nomChamp}</th>
+				<th>${5:nomChamp}</th>
+	GO;
+
+	// Import from CSV
+	if ($data = fopen(__DIR__."/$1.csv", "r")) {
+		while ($line = fgetcsv($data, 200, "${0:, | ;}")) {
+			echo "<tr>";
+			foreach($line as $v) {
+				echo "<td>$v</td>";
+			}
+			echo "</tr>";
+		}
+	} else {
+		throw new Exception("fichier $1.csv introuvable");
+	}
+	echo "</table>";
+}
+endsnippet
+
+
+snippet exportCSV "export date to file.csv"
+if (
+	!empty($_POST["${1:varName}"]) and
+	!empty($_POST["${2:varName}"]) and
+	!empty($_POST["${3:varName}"]) and
+	!empty($_POST["${4:varName}"])
+){
+	// if string htmlspecialchars() to parse script
+	$$1= $_POST["$1"];
+	$$2= $_POST["$2"];
+	$$3= $_POST["$3"];
+	$$4= $_POST["$4"];
+
+	$${5:arrName} = [
+		"$1" => $$1,
+		"$2" => $$2,
+		"$3" => $$3,
+		"$4" => $$4
+		];
+
+		// print_r($$5);
+		if ( $data = fopen(__DIR__."/${6:fileName}.csv", "a")) {
+			flock($data, LOCK_EX);
+			fputcsv($data, $$5, ";");
+			flock($data, LOCK_UN);
+			fclose($data);
+		} else {
+			throw new Exception("fichier $6.csv introuvable!");
+		}
+}
+endsnippet
+
+
+snippet writeToXML "write date to XML file"
+	// Create an instance of DOMDocument class
+	$dom = new DOMDocument('1.0', 'UTF-8');
+
+	// Create an instance of the DOMImplementation class
+	$imp = new DOMImplementation();
+
+	// Create a DOMDocumentType instance
+	$dtd = $imp->createDocumentType('${1:docName}', '', '$1.dtd');
+
+	// Append DOMDocumentType to dom
+	$dom->appendChild($dtd);
+
+	// Create an empty element
+	$${2:root} = $dom->createElement('$2');
+
+	// Append the element
+	$dom->appendChild($$2);
+
+	foreach ($${3:array of element, object, etc..} as $e) {
+		$${4:element of root} = $dom->createElement('$4');
+		$$2->appendChild($$4);
+		$$4->appendChild($dom->createElement('${5:child of element}', $e[0]));
+		$$4->appendChild($dom->createElement('${6:child of element}', $e[1]));
+		$$4->appendChild($dom->createElement('${7:child of element}', $e[2]));
+		$$4->appendChild($dom->createElement('${8:child of element}', $e[3]));
+	}
+
+	// Retrieve and print the document
+	// echo $dom->saveXML();
+
+	// $filename = "test.xml";
+	$dom->save('$1.xml');
+endsnippet
+
+snippet readxmlXpath "read a xml file with xpath"
+// Utilisation de xpath pour lire un fichier xml
+if (file_exists(__DIR__.'/${1:fileName}.xml')) {
+	$doc = new DOMDocument();
+	$doc->load('$1.xml');
+	// Creation d'une instance de Xpath
+	$xpath = new DOMXPath($doc);
+
+	// Récupérer tous les éléments <elementName>
+	$elements = $xpath->query("//${2:elementName}");
+
+	if (!is_null($elements)) {
+
+		/* TODO: */
+		/* echo "<table>"; */
+		/* echo "<tr><th>NOM</th></tr>"; */
+		/* foreach($elements as $element) { */
+		// get name of node
+		/* 	// $e = $element->nodeName; */
+		/* 	// var_dump($e); */
+		// get value of node
+		/* 	$nom = $element->nodeValue; */
+		/* 	// var_dump($nom); */
+		/* 	echo <<<GO */
+		/* 		<tr><td><a href="get_employee.php?name=$nom">$nom</a></td></tr> */
+		/* 	GO; */
+		/* } */
+		/* echo "</table>"; */
+	}
+
+}
+endsnippet
+
+snippet readXmlSimple "read a xml file with simplexml"
+// Utilisation de simplexml pour traiter un fichier xml
+$xml = simplexml_load_file(__DIR__."/${1:fileName}.xml");
+// print_r($xml);
+
+foreach($xml->${2:element of xml} as $e) {
+	if ((${3:type cast})$e->${4:child of element} == ($3) $_GET["$4"]) {
+		// echo $e->$4;
+		echo <<<GO
+			$2:
+			$4=$e->$4
+			${5:child of elm}=$e->$5
+			${6:child of elm}=$e->$6
+			${7:child of elm}=$e->$7
+		GO;
+	}
+}
+endsnippet
+
+snippet connexpdo "connexion to pdo"
+function connexpdo(string $db)
+{
+    $sgbd = "mysql";
+    $host = "localhost";
+    $port = 3306; // port par défaut de MySQL (à adapter selon votre config et votre choix entre mysql/mariadb)
+    $charset = "UTF8";
+
+    // A MODIFIER
+    $user = "${1:userName}"; // user id
+    $pass = "${2:userPasswd}"; // password
+
+    try {
+        $pdo = new pdo("$sgbd:host=$host;port=$port;dbname=$db;charset=$charset", $user, $pass,array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
+        return $pdo;
+    } catch (PDOException $e) {
+        $code = $e->getCode();
+        $message = $e->getMessage();
+        $trace = $e->getTraceAsString();
+        echo <<<ERR
+            <h1>PDO Connexion ERROR : </h1>
+            <p>code error : $code</p>
+            <p>message error : $message</p>
+            <p>TRACE : $trace</p>
+            ERR;
+    }
+}
+endsnippet
+
+
+snippet pdoSelect "pdo select query"
+require ("connexpdo.inc.php");
+$pdo = connexpdo("${1:dataName}");
+$stt = $pdo->query("select * from ${2:tableName t} ${3: cdt}");
+$records = $stt->fetchAll(PDO::FETCH_ASSOC);
+
+echo <<<HD
+	<table>
+		<tr>
+			<th>${4:colonneTitle}</th>
+			<th>${5:colonneTitle}</th>
+			<th>${6:colonneTitle}</th>
+	HD;
+
+foreach($records as $record) {
+	$${7:attribut} = $record["$7"];
+	$${8:attribut} = $record["$8"];
+	$${9:attribut} = $record["$9"];
+	echo <<<BODY
+		<tr>
+			<td>$$7</td>
+			<td>$$8</td>
+			<td>$$9</td>
+		</tr>
+	BODY;
+}
+
+echo <<<ED
+		</tr>
+	</table>
+	ED;
+endsnippet
+
+
+snippet pdoInsertParm "pdo select query"
+require ("connexpdo.inc.php");
+
+$pdo = connexpdo("${1:dataBaseName}");
+
+if (
+	!empty($_POST["${2:varName}"])
+	&& !empty($_POST["${3:varName}"])
+	&& !empty($_POST["${4:varName}"])
+	) {
+	$$2 = $_POST["$2"];
+	$$3 = $_POST["$3"];
+	$$4 = $_POST["$4"];
+	echo $$2." ".$$3." ".$$4;
+	$stt = $pdo->prepare("INSERT INTO ${0:tableName} ($2, $3, $4) VALUES(?,?,?)");
+	$stt->execute([$$2, $$3, $$4]);
+}
+endsnippet
+
+snippet pdoInsertParmVal "pdo select query with parametre value"
+require ("connexpdo.inc.php");
+
+$pdo = connexpdo("${1:dataBaseName}");
+
+if (
+	!empty($_POST["${2:varName}"])
+	&& !empty($_POST["${3:varName}"])
+	&& !empty($_POST["${4:varName}"])
+	) {
+
+	$data = [
+	'$2' => $_POST['$2'],
+	'$3' => $_POST['$3'],
+	'$4' => $_POST['$4'],
+	];
+
+	$qry = "INSERT INTO ${0:tableName} ($2, $3, $4) VALUES (:$2, :$3, :$4)";
+	$stt = $pdo->prepare($qry);
+	$stt->execute($data);
+}
+endsnippet
+
+snippet pdoInsertParmValBound "pdo select query with bound value"
+require ("connexpdo.inc.php");
+
+$pdo = connexpdo("${1:dataBaseName}");
+
+if (
+	!empty($_POST["${2:varName}"])
+	) {
+
+	// On ajoute %..% pour l'utiliser comme un mask avec LIKE
+	$$2 = "%".$_POST["$2"]."%";
+
+	$qry = "select * from ${3:tableName} where ${4:attribut} like :$2";
+
+	$stt = $pdo->prepare($qry);
+
+	$stt->bindParam(':$2', $$2, PDO::PARAM_STR);
+	$stt->execute();
+	$stt->bindColumn('${5:columnName}', $$5);
+	$stt->bindColumn('${6:columnName}', $$6);
+	echo "<table border=\"1\" >";
+	while ($stt->fetch(PDO::FETCH_BOUND)) {
+		echo " <tr><td>$$5</td><td> $$6</td>";
+	}
+	echo "</table>";
+} else  {
+	echo "<p><b>Formulaire à compléter!</b></p>";
+}
+endsnippet
+
+snippet pdoFetchClass "pdo with FETCH::CLASS"
+// build a class for fetch::class
+class voiture {
+	private $$4;
+	private $$5;
+	private $$6;
+	private $$7;
+
+	public function get_$4() {return $this->$4;}
+	public function get_$5() {return $this->$5;}
+	public function get_$6() {return $this->$6;}
+	public function get_$7() {return $this->$7;}
+
+	public function set_$4($$4) { $this->$4 = $$4;}
+	public function set_$5($$5) { $this->$5 = $$5;}
+	public function set_$6($$6) { $this->$6 = $$6;}
+	public function set_$7($$7) { $this->$7 = $$7;}
+}
+
+if (!empty($_POST["${1:varName}"])
+	&& !empty($_POST["${2:varName}"])
+	) {
+	require ("connexpdo.inc.php");
+	$pdo = connexpdo("${3:dataBaseName}");
+
+	// quote () met des ' '
+	$$1 = $pdo->quote($_POST["$1"]);
+	$$2 = $pdo->quote($_POST["$2"]);
+
+	$qry = "select
+	${4:attribut to class}
+	,${5: attribut to class}
+	,${6: attribut to class}
+	,${7: attribut to class}
+	from ${8:tableName}
+	where
+	$1 = $$1 and $2 = $$2";
+
+	$stt = $pdo->query($qry);
+
+	$records = $stt->fetchAll(PDO::FETCH_CLASS, '${0:className}');
+
+	echo "<h2>Liste des véhicules de $$1 $$2</h2>";
+	echo "<table border=\"1\">";
+	foreach($records as $r) {
+		echo "<tr>";
+		//maybe we need camel case!
+		echo "<td>".$r->get_$4()."</td>";
+		echo "<td>".$r->get_$5()."</td>";
+		echo "<td>".$r->get_$6()."</td>";
+		echo "<td>".$r->get_$7()."</td>";
+		echo "</tr>";
+	}
+	echo "</table>";
+
+} else  {
+	echo "<p><b>Formulaire à compléter!</b></p>";
+}
+endsnippet
+
+
+snippet pdoFetchObject "pdo with fetchObject()"
+
+if (!empty($_POST["${1:varName}"])
+	&& !empty($_POST["${2:varName}"])
+	) {
+	require ("connexpdo.inc.php");
+	$pdo = connexpdo("${3:dataBaseName}");
+
+	// quote () met des ' '
+	$$1 = $pdo->quote($_POST["$1"]);
+	$$2 = $pdo->quote($_POST["$2"]);
+
+	$qry = "select
+	${4:attribut for object}
+	,${5: attribut for object}
+	,${6: attribut for object}
+	,${7: attribut for object}
+	from ${8:tableName}
+	where
+	$1 = $$1 and $2 = $$2";
+
+	$stt = $pdo->query($qry);
+
+	echo "<h2>Liste des véhicules de $$1 $$2</h2>";
+	echo "<table border=\"1\">";
+	while ($record = $stt->fetchObject() ) {
+		echo "<tr>";
+		echo "<td>".$record->$4."</td>";
+		echo "<td>".$record->$5."</td>";
+		echo "<td>".$record->$6."</td>";
+		echo "<td>".$record->$7."</td>";
+		echo "</tr>";
+	}
+	echo "</table>";
+
+} else  {
+	echo "<p><b>Formulaire à compléter!</b></p>";
+}
+endsnippet
+
+snippet traiterDonne ""
+	// on traite données par exemple d'une personne qu'on
+	// le nom prenom récupérer dans un poste et on veut separer
+	// en nom et prenom.
+	$tab_$1 = explode(" ", $_POST["${1:varName}"]);
+	// var_dump($tab_$1);
+	$${2:varName} = implode(" ", array_slice($tab_$1, 0, 1));
+	$${3:varName} = implode(" ", array_slice($tab_$1, 1));
+	// var_dump($nom);
+	// var_dump($prenom);
+endsnippet
+
+snippet pdoTransaction ""
+	try {
+		// On commmence la transaction
+    $pdo->beginTransaction();
+		// sql commande
+		// Transaction réussi
+    $pdo->commit();
+	}catch (Exception $e){
+		// Transaction échoue
+    $pdo->rollback();
+    throw $e;
+	}
+endsnippet

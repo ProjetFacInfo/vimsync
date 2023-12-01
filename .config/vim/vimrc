@@ -229,8 +229,8 @@ autocmd WinEnter * silent! iunmap <C-s>
 autocmd WinEnter * silent! unmap <C-s>
 autocmd WinEnter * silent! vunmap <C-s>
 let g:UltiSnipsExpandTrigger           = '<C-s>'
-let g:UltiSnipsJumpForwardTrigger      = '<C-s>'
-let g:UltiSnipsJumpBackwardTrigger     = '<C-w>'
+let g:UltiSnipsJumpForwardTrigger      = '<C-j>'
+let g:UltiSnipsJumpBackwardTrigger     = '<C-k>'
 let g:UltiSnipsSnippetDirectories = [$HOME.'/.config/vim/Ultisnips/', 'Ultisnips']
 
 " show open buffers on top, you can swap between buffers with <leader>n

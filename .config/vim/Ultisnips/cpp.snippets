@@ -1,0 +1,81 @@
+
+snippet class "class {..}"
+class ${1:`!p snip.rv = snip.basename or "name"`}
+: public ${0:parent}
+{
+private:
+	${2:/* data_type */} _${3:/* data */};
+	${4:/* data_type */} _${5:/* data */};
+	${6:/* cplx_data_type */} _${7:/* cplx_data */};
+	${8:/* cplx_data_type */} _${9:/* cplx_data */};
+
+public:
+	${1/(\w+).*/$1/} () =default {}
+	${1/(\w+).*/$1/}
+	($2 $3
+	, $4 $5
+	, const $6 & $7
+	, const $8 & $9
+	)
+		:_$3($3)
+		, _$5($5)
+		, _$7($7)
+		, _$9($9)
+		{}
+	${1/(\w+).*/$1/} (const $1 & o) =default {}
+	~${1/(\w+).*/$1/} () =default;
+
+	$2 get_$3() {return _$3;}
+	$4 get_$5() {return _$5;}
+	const $6 & get_$7() {return _$7;}
+	const $8 & get_$9() {return _$9;}
+
+	void set_$3($2 $3) { _$3 = $3; }
+	void set_$5($4 $5) { _$5 = $5; }
+	void set_$7(const $6 & $7) { _$7 = $7; }
+	void set_$5(const $8 & $9) { _$9 = $9; }
+
+};
+endsnippet
+
+
+snippet class3 "class {..}"
+class ${1:`!p snip.rv = snip.basename or "name"`}
+: public ${0:parent}
+{
+private:
+	${2:/* dynamic_data_type */} * _${3:/* data */};
+	${4:/* data_type */} _${5:/* size_of_dynamic_data */};
+
+public:
+	//constructeur par défault : vide.
+	${1/(\w+).*/$1/} ():_$3(nullptr), _$5(0){}
+	// constructeur par parametre
+	${1/(\w+).*/$1/} ($2 $3, $4 $5)
+	:_$3(new $2[$5]) , _$5($5) {}
+	// constructeur par copie
+	${1/(\w+).*/$1/} (const $1 & o):_$5(o._$5)  {
+		/* TODO : constructeur par copie */
+		/* delete [] _ens; */
+		/* _ens = (_taille == 0 ? nullptr : new type[_taille]); */
+		/* for (type i = 0; i < _taille; ++i) { */
+		/* 	_ens[i] = source._ens[i]; */
+		/* } */
+	}
+
+	/* TODO : affectation operator= */
+
+	~${1/(\w+).*/$1/} () =default;
+
+	$2 get_$3() {return _$3;}
+	$4 get_$5() {return _$5;}
+	$6 get_$7() {return _$7;}
+	const $8 & get_$9() {return _$9;}
+
+	void set_$3($2 $3) { _$3 = $3; }
+	void set_$5($4 $5) { _$5 = $5; }
+	void set_$7($6 $7) { _$7 = $7; }
+	void set_$5(const $8 & $9) { _$9 = $9; }
+
+};
+endsnippet
